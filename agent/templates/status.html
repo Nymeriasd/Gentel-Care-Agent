@@ -1,0 +1,159 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+  <!-- Page Heading -->
+  <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+              class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> -->
+  <!-- <p class="mb-4">DataTables is a third party plugin that is used to generate the demo table below. For more
+            information about DataTables, please visit the <a target="_blank" href="https://datatables.net">official
+              DataTables documentation</a>.</p> -->
+
+  <!-- DataTales Example -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal"
+        data-target="#insertModal"><i class="fas fa-plus fa-sm text-white-50"></i> Add Status</a>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Status</th>
+              <th>CreatedAt</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <!-- <tfoot>
+                    <tr>
+                      <th>Id</th>
+                      <th>Name</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </tfoot> -->
+          <tbody>
+            {% for item in SituationItems %}
+            <tr>
+              <td>{{ item.IdSituation }}</td>
+              <td>{{ item.Situation }}</td>
+              <td>{{ item.CreatedAt }}</td>
+              <td>
+                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal"
+                  data-target="#editModal{{ item.IdSituation }}"><i class="fas fa-edit fa-sm text-white-50"></i>
+                  Edit </a>
+                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal"
+                  data-target="#deleteModal{{ item.IdSituation }}"><i class="fas fa-trash-alt fa-sm text-white-50"></i>
+                  Delete
+                </a>
+              </td>
+            </tr>
+
+
+            <!-- edit Modal-->
+            <div class="modal fade" id="editModal{{ item.IdSituation }}" tabindex="-1" role="dialog"
+              aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Status</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <form action="{{url_for('status.edit_situation', IdSituation = item.IdSituation )}}" method="POST">
+                      <div class="row">
+                        <div class="col">
+                          <label for="exampleFormControlSelect1">Insert Status :</label>
+                          <input type="text" class="form-control" placeholder="{{ item.Situation }}"
+                            name="SituationName">
+                        </div>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                  </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- delete Modal-->
+            <div class="modal fade" id="deleteModal{{ item.IdSituation }}" tabindex="-1" role="dialog"
+              aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete Status</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">Are you sure you want to delete {{ item.Situation}} ?</div>
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary"
+                      href="{{url_for('status.delete_situation', IdSituation = item.IdSituation )}}">Delete</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- /.container-fluid -->
+
+</div>
+<!-- End of Main Content -->
+
+<!-- Footer -->
+
+<!-- End of Footer -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+  <i class="fas fa-angle-up"></i>
+</a>
+
+
+<!-- insert Modal-->
+<div class="modal fade" id="insertModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Insert Status</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{url_for('status.add_situation')}}" method="POST">
+          <div class="row">
+            <div class="col">
+              <label for="exampleFormControlSelect1">Insert Status :</label>
+              <input type="text" class="form-control" placeholder="Status name" name="SituationName">
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" type="submit">Submit</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,213 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+  <!-- Page Heading -->
+  <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+              class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> -->
+  <!-- <p class="mb-4">DataTables is a third party plugin that is used to generate the demo table below. For more
+            information about DataTables, please visit the <a target="_blank" href="https://datatables.net">official
+              DataTables documentation</a>.</p> -->
+
+  <!-- DataTales Example -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal"
+        data-target="#insertModal"><i class="fas fa-plus fa-sm text-white-50"></i> Add Customer</a>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Email</th>
+              <th>Phone Number</th>
+              <th>Address</th>
+              <!-- <th>Crop</th> -->
+              <!-- <th>Harvest Date</th> -->
+              <th>CreatedAt</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <!-- <tfoot>
+                        <tr>
+                          <th>Id</th>
+                          <th>Name</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </tfoot> -->
+          <tbody>
+            {% for item in FarmerItems %}
+            <tr>
+              <td>{{ item.Idfarmer }}</td>
+              <td>{{ item.FirstName }}</td>
+              <td>{{ item.LastName }}</td>
+              <td></td>
+              <td>{{ item.PhoneNumber }}</td>
+              <td>{{ item.Address }}</td>
+              <td></td>
+              <!-- <td>{{ item.Harvestime }}</td> -->
+              <td>{{ item.CreatedAt }}</td>
+              <td>
+                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal"
+                  data-target="#editModal{{ item.Idfarmer }}"><i class="fas fa-edit fa-sm text-white-50"></i>
+                  Edit </a>
+                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal"
+                  data-target="#deleteModal{{  item.Idfarmer }}"><i class="fas fa-trash-alt fa-sm text-white-50"></i>
+                  Delete </a>
+              </td>
+            </tr>
+
+
+            <!-- edit Modal-->
+            <div class="modal fade" id="editModal{{ item.Idfarmer }}" tabindex="-1" role="dialog"
+              aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Customer</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <form action="{{url_for('farmer.edit_farmer', Idfarmer = item.Idfarmer )}}" method="POST">
+                      <div class="form-row">
+                        <div class="form-group col-md-6">
+                          <label for="inputEmail4">First name :</label>
+                          <input type="text" class="form-control" id="inputEmail4" placeholder="{{ item.FirstName }}"
+                            name="FirstName">
+                        </div>
+                        <div class="form-group col-md-6">
+                          <label for="inputPassword4">Last name :</label>
+                          <input type="text" class="form-control" id="inputPassword4" placeholder="{{ item.LastName }}"
+                            name="LastName">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="inputAddress">Phone number :</label>
+                        <input type="text" class="form-control" id="inputAddress" placeholder="{{ item.PhoneNumber }}"
+                          name="PhoneNumber">
+                      </div>
+                      <div class="form-group">
+                        <label for="inputAddress2">Address :</label>
+                        <input type="text" class="form-control" id="inputAddress2" placeholder="{{ item.Address }}"
+                          name="Address">
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleFormControlSelect1">Choose crop :</label>
+                        <select class="form-control" id="exampleFormControlSelect1" name="Crop">
+                          {% for crop in CropItems %}
+                          <option value="{{ crop.IdCrop }}">{{ crop.Name }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="inputAddress2">Harvest time :</label>
+                        <input type="date" class="form-control" id="inputAddress2" name="Harvestime">
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                  </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- delete Modal-->
+            <div class="modal fade" id="deleteModal{{ item.Idfarmer }}" tabindex="-1" role="dialog"
+              aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete Farmer</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">Are you sure you want to delete {{ item.FirstName }} {{ item.LastName }} ?
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="{{url_for('farmer.delete_farmer', Idfarmer = item.Idfarmer )}}">Delete</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- /.container-fluid -->
+
+</div>
+<!-- End of Main Content -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+  <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- insert Modal-->
+<div class="modal fade" id="insertModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Insert Customer</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{url_for('farmer.add_farmer')}}" method="POST">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="inputEmail4">First name :</label>
+              <input type="text" class="form-control" id="inputEmail4" placeholder="First name" name="FirstName">
+            </div>
+            <div class="form-group col-md-6">
+              <label for="inputPassword4">Last name :</label>
+              <input type="text" class="form-control" id="inputPassword4" placeholder="Last name" name="LastName">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="inputAddress">Phone number :</label>
+            <input type="text" class="form-control" id="inputAddress" placeholder="Phone number" name="PhoneNumber">
+          </div>
+          <div class="form-group">
+            <label for="inputAddress2">Email :</label>
+            <input type="text" class="form-control" id="inputAddress2" placeholder="Email "
+              name="Address">
+          </div>
+          <div class="form-group">
+            <label for="inputAddress2">Address :</label>
+            <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor"
+              name="Address">
+          </div>
+          <div class="form-group">
+            <label for="inputAddress2">Harvest time :</label>
+            <input type="date" class="form-control" id="inputAddress2" name="Harvestime">
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" type="submit">Submit</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content %}
