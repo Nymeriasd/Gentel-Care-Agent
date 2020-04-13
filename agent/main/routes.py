@@ -26,7 +26,7 @@ def login():
 @main.route('/index', methods=['POST','GET'])
 @login_required
 def index():
-    OrdersNumbers  = db.session.query(OrdersMaintenance).count()
+    OrdersNumbers  = db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrderStatus.OrderStatus == 'Pending').count()
     AgentNumbers = db.session.query(Agent).count()
     ServiceNumbers = db.session.query(Service).count()
     UsersNumbers = db.session.query(Users).count()

@@ -21,7 +21,7 @@ def random_string_generator(size=5,  chars=string.ascii_uppercase + string.digit
 @orders.route('/order', methods=['POST', 'GET'])
 @login_required
 def get_order():
-    OrdersItems = db.session.query(OrdersMaintenance).all()
+    OrdersItems = db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrderStatus.OrderStatus == 'Pending' and OrdersMaintenance.IdService == Agent.IdService).all()
     ServiceItems = db.session.query(Service).all()
     OrderStatusItems = db.session.query(OrderStatus).all()
     PriorityItems = db.session.query(Priority).all()
