@@ -2,7 +2,7 @@
 import sys
 import logging
 logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0,"/var/www/agent/")
+sys.path.insert(0,"/var/www/Agent/")
 
 from app import app 
 application = app
