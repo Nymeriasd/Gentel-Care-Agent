@@ -5,7 +5,7 @@ from agent import db, bcrypt
 import random
 import string
 from datetime import datetime
-
+import mpu
 
 orders = Blueprint('orders',__name__)
 
@@ -21,30 +21,19 @@ def random_string_generator(size=5,  chars=string.ascii_uppercase + string.digit
 @orders.route('/order', methods=['POST', 'GET'])
 @login_required
 def get_order():
-    OrdersItems = db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrderStatus.OrderStatus == 'Pending' and OrdersMaintenance.IdService == Agent.IdService).all()
-    ServiceItems = db.session.query(Service).all()
-    OrderStatusItems = db.session.query(OrderStatus).all()
-    PriorityItems = db.session.query(Priority).all()
-    TimeItems = db.session.query(Time).all()
-    return render_template('orders.html', OrdersItems = OrdersItems, OrderStatusItems = OrderStatusItems, ServiceItems = ServiceItems, PriorityItems = PriorityItems, TimeItems = TimeItems)
+    OrdersItems = db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrdersMaintenance.IdService == current_user.IdService and OrderStatus.OrderStatus == 'pending').all()
+    try :
+        dist = mpu.haversine_distance((float(current_user.lat), float(current_user.lon)), (float(OrdersItems[0].latit), float(OrdersItems[0].lon)))
+        if dist <= 10.0 :
+            OrdersItemsGeo = db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrdersMaintenance.IdService == current_user.IdService and OrderStatus.OrderStatus == 'pending').all()
+            ServiceItems = db.session.query(Service).all()
+            OrderStatusItems = db.session.query(OrderStatus).all()
+            PriorityItems = db.session.query(Priority).all()
+            TimeItems = db.session.query(Time).all()
+            return render_template('orders.html', OrdersItemsGeo = OrdersItemsGeo, OrderStatusItems = OrderStatusItems, ServiceItems = ServiceItems, PriorityItems = PriorityItems, TimeItems = TimeItems)
+    except Exception as err :
+        return render_template('orders.html')
 
-# add new order
-@orders.route('/order/new', methods=['POST', 'GET'])
-@login_required
-def add_order():
-    if request.method == 'POST':
-        GetService = db.session.query(Service).filter(Service.IdService == request.form['Services']).one()
-        NewOrder = OrdersMaintenance(OrderNumber = "O"+random_string_generator(), FirstName = request.form['CustomerFirstName'], LastName = request.form['CustomerLastName'], PhoneNumber = request.form['CustomerPhone'], Address = request.form['CustomerAddress'], Email = request.form['CustomerEmail'], IdService = request.form['Services'], IdPriority = request.form['Priority'], IdOrderStatus = 1, Ordertime = request.form['Ordertime'], Price = GetService.Price, Comment = request.form['comment'], Time = request.form['Time'])
-        try :
-            db.session.add(NewOrder)
-            db.session.commit()
-    
-            flash('Yes !! Order inserted successfully. Great Job ' + current_user.FirstName + Happy , 'success')
-            return redirect(url_for('orders.get_order'))
-        except Exception as err :
-            flash('No !! ' + Sad + ' Order did not insert successfully . Please check insertion ', 'danger')
- 
-    return redirect(url_for('orders.get_order'))
 
 # edit order
 @orders.route('/order/<int:IdOrder>/edit', methods=['POST', 'GET'])
@@ -81,16 +70,31 @@ def edit_order(IdOrder):
 def edit_status_order(IdOrder):
     if request.method == 'POST':
         EditOrder = db.session.query(OrdersMaintenance).filter_by(IdOrder = IdOrder).one()
-        EditOrder.IdOrderStatus = request.form['OrderStatusName']
-       
-        try :
-            db.session.add(EditOrder)
-            db.session.commit()
-            flash('Yes !! Order status is edited successfully '+ Happy , 'success')
-            return redirect(url_for('orders.get_order'))
-        except Exception as err :
-            flash('No !! ' + Sad + ' Order status did not edit successfully . Please check insertion ' , 'danger')
-         
+        if EditOrder.IdOrderStatus == 1 :
+            EditOrder.IdOrderStatus = request.form['OrderStatusName']
+            EditOrder.IdAgent = current_user.IdAgent
+            try :
+                db.session.add(EditOrder)
+                db.session.commit()
+                flash('Yes !! Order status is edited successfully '+ Happy , 'success')
+                return redirect(url_for('orders.get_order'))
+            except Exception as err :
+               flash('No !! ' + Sad + ' Order status did not edit successfully . Please check insertion ' , 'danger')
+        else :
+            flash('Sorry !! ' + Sad + 'This Order has been accepted by other Agent ' , 'danger')
+        if EditOrder.IdOrderStatus != 1 and EditOrder.IdAgent == current_user.IdAgent :
+            EditOrder.IdOrderStatus = request.form['OrderStatusName']
+            EditOrder.IdAgent = current_user.IdAgent
+            try :
+                db.session.add(EditOrder)
+                db.session.commit()
+                flash('Yes !! Order status is edited successfully '+ Happy , 'success')
+                return redirect(url_for('orders.get_order'))
+            except Exception as err :
+               flash('No !! ' + Sad + ' Order status did not edit successfully . Please check insertion ' , 'danger')
+        else :
+            flash('Sorry !! ' + Sad + 'This Order has been accepted by other Agent ' , 'danger')
+            
     return redirect(url_for('orders.get_order'))
 
 

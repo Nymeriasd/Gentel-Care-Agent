@@ -21,7 +21,7 @@
           <div class="row no-gutters align-items-center">
             <div class="col mr-2">
               <div class="text-xs font-weight-bold text-success text-uppercase mb-1">#of Pending Orders</div>
-              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ OrdersNumbers }}</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{  PendingOrdersNumbers }}</div>
             </div>
             <div class="col-auto">
               <i class="fas fa-truck fa-2x text-gray-300"></i>
@@ -76,7 +76,7 @@
           <div class="row no-gutters align-items-center">
             <div class="col mr-2">
               <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">#of Done Orders</div>
-              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ OrdersNumbers }}</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ DoneOrdersNumbers }}</div>
             </div>
             <div class="col-auto">
               <i class="fas fa-cogs fa-2x text-gray-300"></i>
@@ -125,19 +125,90 @@
 
 
 
-  <!-- Content Row -->
-
   <div class="row">
 
+    <!-- Area Chart -->
+    <div class="col-xl-12 col-lg-12">
+      <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Orders Map Overview</h6>
+          <div class="dropdown no-arrow">
+            <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+              <div class="dropdown-header">Dropdown Header:</div>
+              <a class="dropdown-item" href="#">Action</a>
+              <a class="dropdown-item" href="#">Another action</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#">Something else here</a>
+            </div>
+          </div>
         </div>
         <!-- Card Body -->
         <div class="card-body">
-          <div class="chart-area">
-            <canvas id="myAreaChart"></canvas>
-          </div>
+          <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAaVF2b8c8-Ml6_gDTfRaESPZeZOFQDUX0"></script>
+          <script type="text/javascript">
+
+            function initialize() {
+              var myLatlng = new google.maps.LatLng(-1.2977282, 36.8874135);
+              var myOptions = {
+                zoom: 12,
+                center: myLatlng,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+              }
+              map = new google.maps.Map(document.getElementById("map"), myOptions);
+              TestMarker();
+            }
+
+
+            function TestMarker() {
+
+              var infoWindow = new google.maps.InfoWindow();
+
+              {% for item in GeoItems %}
+              
+              var lat = {{ item.lat }}
+              var long = {{ item.lon }};
+              var Id = {{ item.IdGeo }};
+              
+
+            var location = new google.maps.LatLng(lat, long);
+
+            var marker = new google.maps.Marker({
+              map: map,
+              draggable: true,
+              animation: google.maps.Animation.DROP,
+              title: "heloooo" ,
+              // icon: 'http://maps.google.com/mapfiles/ms/icons/blue.png',
+              position: location,
+            });
+
+            (function (marker, nIdame) {
+                google.maps.event.addListener(marker, "click", function (e) {
+                    infoWindow.setContent("<div style = 'width:150px;min-height:40px'> <span> {{ item.business.BusinesName }} </span> </div>");
+                    infoWindow.open(map, marker);
+                });
+            })(marker, Id);
+        
+
+            {% endfor %}
+
+            }
+
+          </script>
+
+          <body onload="initialize()">
+            <div class="container">
+              <div id="map" style="width:100%; height:500px;"></div>
+            </div>
+          </body>
         </div>
-      </div>
-    </div>
+
+
 
 
     <div class="col-lg-6 mb-4">

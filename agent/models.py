@@ -84,7 +84,6 @@ class Farmer(db.Model):
     LastName = db.Column(db.String(250), nullable=True)
     PhoneNumber = db.Column(db.String(250), nullable=True)
     Address = db.Column(db.String(250), nullable=True)
-    # IdCrop = db.Column(db.Integer , db.ForeignKey('crop.IdCrop'))
     Harvestime = db.Column(db.String(250), nullable=True)
     CreatedAt = db.Column(db.DateTime, nullable=False) 
 
@@ -102,6 +101,8 @@ class Agent(db.Model, UserMixin):
     IdService = db.Column(db.Integer , db.ForeignKey('service.IdService'))
     Enabled = db.Column(db.Integer, db.ForeignKey('situation.IdSituation'))
     Time = db.Column(db.Integer, db.ForeignKey('time.IdTime'))
+    lat = db.Column(db.String(250), nullable=True)
+    lon = db.Column(db.String(250), nullable=True)
     CreatedAt = db.Column(db.DateTime, nullable=False) 
 
     service = db.relationship('Service',  backref="Agent")
@@ -128,7 +129,7 @@ class Agent(db.Model, UserMixin):
         return Agent.query.get(user_id)
 
     def __repr__(self) :
-        return f"Agent('{self.IdAgent}',{self.FirstName}','{self.LastName}','{self.Password}','{self.PhoneNumber}','{self.Address}','{self.IdService}','{self.Time}','{self.CreatedAt}')"        
+        return f"Agent('{self.IdAgent}',{self.FirstName}','{self.LastName}','{self.Password}','{self.PhoneNumber}','{self.Address}','{self.IdService}','{self.Time}','{self.lat}','{self.lon}','{self.CreatedAt}')"        
 
     def get_id(self):
         return (self.IdAgent)
@@ -168,11 +169,14 @@ class OrdersMaintenance(db.Model):
     Email = db.Column(db.String(250), nullable=True)
     Address  = db.Column(db.String(250), nullable=True)
     IdService  = db.Column(db.Integer, db.ForeignKey('service.IdService'))
+    IdAgent = db.Column(db.Integer, db.ForeignKey('agent.IdAgent'))
     Price  = db.Column(db.String(250), nullable=True)
     IdPriority  = db.Column(db.Integer, db.ForeignKey('priority.IdPriority'))
     IdOrderStatus  = db.Column(db.Integer, db.ForeignKey('order_status.IdOrderStatus'))
     Ordertime = db.Column(db.String(250), nullable=True) 
     Time = db.Column(db.Integer, db.ForeignKey('time.IdTime')) 
+    latit = db.Column(db.String(250), nullable=True)
+    lon = db.Column(db.String(250), nullable=True)
     Comment = db.Column(db.String(250), nullable=True) 
     CreatedAt = db.Column(db.DateTime, nullable=False)
 
@@ -180,10 +184,11 @@ class OrdersMaintenance(db.Model):
     priority = db.relationship("Priority", backref="OrdersMaintenance") 
     status = db.relationship("OrderStatus", backref="OrdersMaintenance") 
     time = db.relationship("Time", backref="OrdersMaintenance") 
+    agent = db.relationship("Agent", backref="OrdersMaintenance") 
 
 
     def __repr__(self) :
-        return f"OrdersMaintenance('{self.IdOrder}',{self.OrderNumber}','{self.FirstName}','{self.LastName}','{self.PhoneNumber}','{self.Email}','{self.IdService}','{self.Price}','{self.IdPriority}','{self.IdOrderStatus}','{self.Ordertime}','{self.Time}','{self.Comment}')"        
+        return f"OrdersMaintenance('{self.IdOrder}',{self.OrderNumber}','{self.FirstName}','{self.LastName}','{self.PhoneNumber}','{self.Email}','{self.IdService}','{self.Price}','{self.IdPriority}','{self.IdAgent}','{self.IdOrderStatus}','{self.Ordertime}','{self.Time}','{self.latit}','{self.lon}','{self.Comment}')"        
 
 class OrderStatus(db.Model):
     IdOrderStatus = db.Column(db.Integer, primary_key=True)

@@ -26,11 +26,12 @@ def login():
 @main.route('/index', methods=['POST','GET'])
 @login_required
 def index():
-    OrdersNumbers  = db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrderStatus.OrderStatus == 'Pending').count()
+    PendingOrdersNumbers  =  db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrdersMaintenance.IdService == current_user.IdService and OrderStatus.OrderStatus == 'pending').count()
+    DoneOrdersNumbers  =  db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrdersMaintenance.IdService == current_user.IdService).filter(OrdersMaintenance.IdAgent == current_user.IdAgent).filter(OrderStatus.OrderStatus == 'Done').count()
     AgentNumbers = db.session.query(Agent).count()
     ServiceNumbers = db.session.query(Service).count()
     UsersNumbers = db.session.query(Users).count()
-    return render_template('index.html', OrdersNumbers = OrdersNumbers, AgentNumbers = AgentNumbers, ServiceNumbers = ServiceNumbers, UsersNumbers = UsersNumbers)
+    return render_template('index.html', PendingOrdersNumbers = PendingOrdersNumbers, AgentNumbers = AgentNumbers, ServiceNumbers = ServiceNumbers, UsersNumbers = UsersNumbers, DoneOrdersNumbers = DoneOrdersNumbers)
     
 # logout route
 @main.route('/logout')
