@@ -35,42 +35,13 @@ def get_order():
         return render_template('orders.html')
 
 
-# edit order
-@orders.route('/order/<int:IdOrder>/edit', methods=['POST', 'GET'])
-@login_required
-def edit_order(IdOrder):
-    if request.method == 'POST':
-        EditOrder = db.session.query(OrdersMaintenance).filter_by(IdOrder = IdOrder).one()
-        EditOrder.FirstName = request.form['CustomerFirstName']
-        EditOrder.FirstName  = request.form['CustomerLastName']
-        EditOrder.PhoneNumber = request.form['CustomerPhone']
-        EditOrder.Address = request.form['CustomerAddress']
-        EditOrder.Email  = request.form['CustomerEmail']
-        EditOrder.IdService  = request.form['Services']
-        GetService = db.session.query(Service).filter(Service.IdService == EditOrder.IdService).one()
-        EditOrder.IdPriority  = request.form['Priority']
-        EditOrder.Ordertime  = request.form['Ordertime']
-        EditOrder.Price  = GetService.Price
-        EditOrder.Comment  = request.form['comment']
-        EditOrder.Time  = request.form['Time']
-        try :
-            db.session.add(EditOrder)
-            db.session.commit()
-            flash('Yes !! Order is edited successfully '+ Happy , 'success')
-            return redirect(url_for('orders.get_order'))
-        except Exception as err :
-            flash('No !! ' + Sad + ' Order did not edit successfully . Please check insertion ' , 'danger')
-           
-    return redirect(url_for('orders.get_order'))
-
-
 # edit status order
 @orders.route('/order/<int:IdOrder>/status', methods=['POST', 'GET'])
 @login_required
 def edit_status_order(IdOrder):
     if request.method == 'POST':
         EditOrder = db.session.query(OrdersMaintenance).filter_by(IdOrder = IdOrder).one()
-        if EditOrder.IdOrderStatus == 1 :
+        if EditOrder.IdAgent == 0 :
             EditOrder.IdOrderStatus = request.form['OrderStatusName']
             EditOrder.IdAgent = current_user.IdAgent
             try :
@@ -79,10 +50,9 @@ def edit_status_order(IdOrder):
                 flash('Yes !! Order status is edited successfully '+ Happy , 'success')
                 return redirect(url_for('orders.get_order'))
             except Exception as err :
-               flash('No !! ' + Sad + ' Order status did not edit successfully . Please check insertion ' , 'danger')
-        else :
-            flash('Sorry !! ' + Sad + 'This Order has been accepted by other Agent ' , 'danger')
-        if EditOrder.IdOrderStatus != 1 and EditOrder.IdAgent == current_user.IdAgent :
+                flash('No !! ' + Sad + ' Order status did not edit successfully . Please check insertion ' , 'danger')
+        
+        elif EditOrder.IdAgent == current_user.IdAgent :
             EditOrder.IdOrderStatus = request.form['OrderStatusName']
             EditOrder.IdAgent = current_user.IdAgent
             try :
@@ -91,13 +61,15 @@ def edit_status_order(IdOrder):
                 flash('Yes !! Order status is edited successfully '+ Happy , 'success')
                 return redirect(url_for('orders.get_order'))
             except Exception as err :
-               flash('No !! ' + Sad + ' Order status did not edit successfully . Please check insertion ' , 'danger')
+                flash('No !! ' + Sad + ' Order status did not edit successfully . Please check insertion ' , 'danger')
         else :
-            flash('Sorry !! ' + Sad + 'This Order has been accepted by other Agent ' , 'danger')
-            
+            flash('No !! ' + Sad + ' Can not changing Order Status  . Order been accepted by another Agent ' , 'danger')
+ 
     return redirect(url_for('orders.get_order'))
-
-
+        
+        
+        
+          
 # delete Order
 @orders.route('/order/<int:IdOrder>/delete', methods=['POST', 'GET'])
 @login_required
