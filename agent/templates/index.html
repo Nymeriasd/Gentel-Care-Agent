@@ -31,43 +31,7 @@
       </div>
     </div>
 
-    <!-- Earnings (Monthly) Card Example -->
-    <!-- <div class="col-xl-3 col-md-6 mb-4">
-      <div class="card border-left-primary shadow h-100 py-2">
-        <div class="card-body">
-          <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">#of Agents</div>
-              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ AgentNumbers }}</div>
-            </div>
-            <div class="col-auto">
-              <i class="fas fa-user fa-2x text-gray-300"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> -->
-
-
-    <!-- Pending Requests Card Example -->
-    <!-- <div class="col-xl-3 col-md-6 mb-4">
-      <div class="card border-left-warning shadow h-100 py-2">
-        <div class="card-body">
-          <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">#of Customers
-              </div>
-              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ AgentNumbers }}</div>
-            </div>
-            <div class="col-auto">
-              <i class="fas fa-comments fa-2x text-gray-300"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> -->
-
-
+  
 
     <!-- Earnings (Monthly) Card Example -->
     <div class="col-xl-3 col-md-6 mb-4">
@@ -85,41 +49,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Earnings (Monthly) Card Example -->
-    <!-- <div class="col-xl-3 col-md-6 mb-4">
-      <div class="card border-left-success shadow h-100 py-2">
-        <div class="card-body">
-          <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">#of Users</div>
-              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ UsersNumbers }}</div>
-            </div>
-            <div class="col-auto">
-              <i class="fas fa-user-circle fa-2x text-gray-300"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> -->
-
-
-    <!-- <div class="col-xl-3 col-md-6 mb-4">
-      <div class="card border-left-success shadow h-100 py-2">
-        <div class="card-body">
-          <div class="row no-gutters align-items-center">
-            <div class="col mr-2">
-              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">#of Feedbacks </div>
-              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ FeedbackNumber }}</div>
-            </div>
-            <div class="col-auto">
-              <i class="fas fa-comments fa-2x text-gray-300"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> -->
-
   </div>
 
 
@@ -154,26 +83,60 @@
           <script type="text/javascript">
 
             function initialize() {
-              var myLatlng = new google.maps.LatLng(-1.2977282, 36.8874135);
+              var myLatlng = new google.maps.LatLng( {{ current_user.lat|float }}, {{ current_user.lon|float }});
               var myOptions = {
                 zoom: 12,
                 center: myLatlng,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
               }
               map = new google.maps.Map(document.getElementById("map"), myOptions);
-              TestMarker();
+              TestMarkerPending();
+              TestMarkerDone();
             }
 
+            function TestMarkerPending() {
 
-            function TestMarker() {
+                var infoWindow = new google.maps.InfoWindow();
+
+                {% for item in PendingOrdersGeo %}
+
+                var lat = {{ item.latit }}
+                var long = {{ item.lon }};
+                var Id = {{ item.lon }}; 
+
+
+                var location = new google.maps.LatLng(lat, long);
+
+                var marker = new google.maps.Marker({
+                map: map,
+                draggable: true,
+                animation: google.maps.Animation.DROP,
+                title: "heloooo" ,
+                icon: 'http://maps.google.com/mapfiles/ms/icons/green.png',
+                position: location,
+                });
+
+                (function (marker, nIdame) {
+                  google.maps.event.addListener(marker, "click", function (e) {
+                      infoWindow.open(map, marker);
+                  });
+                })(marker, Id);
+
+
+                {% endfor %}
+
+                }
+
+
+            function TestMarkerDone() {
 
               var infoWindow = new google.maps.InfoWindow();
 
-              {% for item in GeoItems %}
+              {% for item in DoneOrdersGeo %}
               
-              var lat = {{ item.lat }}
+              var lat = {{ item.latit }}
               var long = {{ item.lon }};
-              var Id = {{ item.IdGeo }};
+              var Id = {{ item.lon }}; 
               
 
             var location = new google.maps.LatLng(lat, long);
@@ -183,14 +146,13 @@
               draggable: true,
               animation: google.maps.Animation.DROP,
               title: "heloooo" ,
-              // icon: 'http://maps.google.com/mapfiles/ms/icons/blue.png',
+              icon: 'http://maps.google.com/mapfiles/ms/icons/red.png',
               position: location,
             });
 
             (function (marker, nIdame) {
                 google.maps.event.addListener(marker, "click", function (e) {
-                    infoWindow.setContent("<div style = 'width:150px;min-height:40px'> <span> {{ item.business.BusinesName }} </span> </div>");
-                    infoWindow.open(map, marker);
+                     infoWindow.open(map, marker);
                 });
             })(marker, Id);
         

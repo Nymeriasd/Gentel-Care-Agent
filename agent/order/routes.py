@@ -21,7 +21,7 @@ def random_string_generator(size=5,  chars=string.ascii_uppercase + string.digit
 @orders.route('/order', methods=['POST', 'GET'])
 @login_required
 def get_order():
-    OrdersItems = db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrdersMaintenance.IdService == current_user.IdService and OrderStatus.OrderStatus == 'pending').all()
+    OrdersItems = db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrdersMaintenance.IdService == current_user.IdService and OrderStatus.OrderStatus != 'pending').all()
     try :
         dist = mpu.haversine_distance((float(current_user.lat), float(current_user.lon)), (float(OrdersItems[0].latit), float(OrdersItems[0].lon)))
         if dist <= 10.0 :

@@ -26,12 +26,14 @@ def login():
 @main.route('/index', methods=['POST','GET'])
 @login_required
 def index():
-    PendingOrdersNumbers  =  db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrdersMaintenance.IdService == current_user.IdService and OrderStatus.OrderStatus == 'pending').count()
+    PendingOrdersNumbers  =  db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrdersMaintenance.IdService == current_user.IdService).filter(OrderStatus.OrderStatus != 'Done').count()
     DoneOrdersNumbers  =  db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrdersMaintenance.IdService == current_user.IdService).filter(OrdersMaintenance.IdAgent == current_user.IdAgent).filter(OrderStatus.OrderStatus == 'Done').count()
     AgentNumbers = db.session.query(Agent).count()
     ServiceNumbers = db.session.query(Service).count()
     UsersNumbers = db.session.query(Users).count()
-    return render_template('index.html', PendingOrdersNumbers = PendingOrdersNumbers, AgentNumbers = AgentNumbers, ServiceNumbers = ServiceNumbers, UsersNumbers = UsersNumbers, DoneOrdersNumbers = DoneOrdersNumbers)
+    DoneOrdersGeo  =  db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrdersMaintenance.IdService == current_user.IdService).filter(OrdersMaintenance.IdAgent == current_user.IdAgent).filter(OrderStatus.OrderStatus == 'Done').all()
+    PendingOrdersGeo  =  db.session.query(OrdersMaintenance).join(OrderStatus).filter(OrdersMaintenance.IdService == current_user.IdService).filter(OrderStatus.OrderStatus != 'Done').all()
+    return render_template('index.html', PendingOrdersNumbers = PendingOrdersNumbers, AgentNumbers = AgentNumbers, ServiceNumbers = ServiceNumbers, UsersNumbers = UsersNumbers, DoneOrdersNumbers = DoneOrdersNumbers, PendingOrdersGeo = PendingOrdersGeo, DoneOrdersGeo = DoneOrdersGeo)
     
 # logout route
 @main.route('/logout')
